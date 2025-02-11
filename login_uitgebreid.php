@@ -14,18 +14,17 @@
     //Mijn kleine bibliotheek verbind met deze pagina 
     //Het is een speciale bibliotheek om accounten te maken of in de accounten te inloggen
 
-    require_once 'account.php';
-
-    use Identity\account;
-    $account = new account();
+    require_once 'account_uitgebreid.php';
+    use Identity_uitgebreid\account_uitgebreid;
+    $account = new account_uitgebreid();
 
     //SESSION OPSTARTEN
     session_start();
     //Controleer of email post wel bestaat, als wel dan login functie opstarten
-    if ((isset($_POST["naam"])))
+    if ((isset($_POST["email"])))
     {
         
-        $account->login(htmlspecialchars($_POST["naam"]),htmlspecialchars($_POST["wachtwoord"]));
+        $account->login(htmlspecialchars($_POST["email"]),htmlspecialchars($_POST["wachtwoord"]));
     }
 
 ?>
@@ -45,17 +44,17 @@
         }
         ?>
 
-        <form action="login.php" method="post">
+        <form action="login_uitgebreid.php" method="post">
             <div class="mb-3 mt-3">
-                <label for="email" class="form-label" >Naam:</label>
-                <input type="text" name = "naam" class="form-control" id="email" placeholder="Vul uw naam in">
+                <label for="email" class="form-label" >Email:</label>
+                <input type="email" name = "email" class="form-control" id="email" placeholder="Vul uw email in">
             </div>
             <div class="mb-5">
                 <label for="wachtwoord" class="form-label">Wachtwoord:</label>
                 <input type="password" name = "wachtwoord" class="form-control" id="wachtwoord" placeholder="Vul uw wachtwoord in">
             </div>
             <button type="submit" class="btn btn-success text-light mb-3 text-grijs">Inloggen</button>
-            <a href="registreer.php" class="btn btn-warning mb-3">Registreren</a>
+            <a href="registreer_uitgebreid.php" class="btn btn-warning mb-3">Registreren</a>
         </form>
     </div>
 </body>
