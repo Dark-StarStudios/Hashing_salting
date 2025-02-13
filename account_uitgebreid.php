@@ -93,6 +93,7 @@ class account_uitgebreid{
                 $statement->bind_result($id,$email,$naam,$Salting,$hash,$aantal_logins);
 
                 $dataNaam = "<error>";
+                $ALog = 0;
                 // Haal de resultaten op
                 while($statement->fetch())
                 {
@@ -103,12 +104,7 @@ class account_uitgebreid{
                     {
                         //Sla alle gegevens van gebruiker behalve wachtwoord in session"login" op
                         $_SESSION["login"] = [$id,$naam,$Salting];
-                        $aantal_logins++;
-                        $statement = $connectie->prepare("UPDATE gebruiker_uitgebreid SET Aantal_logins=".$aantal_logins.", Laatste_login= NOW() WHERE ID=".$id);
-                        if (!$statement->execute())
-                        {
-                            throw new \Exception($connectie->error);
-                        }
+                        $ALog += 1+$aantal_logins;
                     }
                     else
                     {
@@ -125,7 +121,14 @@ class account_uitgebreid{
                     //Sla session"login" op als null
                     $_SESSION["login"] = null;
                 } 
-                
+                if(isset($_SESSION["login"])){
+                    //Update aantal logins in database
+                    $statement = $connectie->prepare("UPDATE gebruiker_uitgebreid SET Aantal_logins=".$ALog.", Laatste_login= NOW() WHERE ID=".$_SESSION["login"][0]);
+                    if (!$statement->execute())
+                    {
+                        throw new \Exception($connectie->error);
+                    }
+                }
             }
             catch(\Exception $e)
             {

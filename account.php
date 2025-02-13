@@ -93,6 +93,7 @@ class account{
                 $statement->bind_result($id,$naam,$Salting,$hash,$aantal_logins);
 
                 $dataNaam = "<error>";
+                $ALog = 0;
                 // Haal de resultaten op
                 while($statement->fetch())
                 {
@@ -103,12 +104,8 @@ class account{
                     {
                         //Sla alle gegevens van gebruiker behalve wachtwoord in session"login" op
                         $_SESSION["login"] = [$id,$naam,$Salting];
-                        $aantal_logins++;
-                        $statement = $connectie->prepare("UPDATE gebruiker SET Aantal_logins=".$aantal_logins.", Laatste_login= NOW() WHERE ID=".$id);
-                        if (!$statement->execute())
-                        {
-                            throw new \Exception($connectie->error);
-                        }
+                        $ALog += 1+$aantal_logins;
+                        
                     }
                     else
                     {
@@ -116,7 +113,7 @@ class account{
                         $_SESSION["login"] = null;
                         //kennisgeving
                         setcookie("waarschruwing","Verkeerde wachtowoord!",time()+2);
-                    }   
+                    }
                 }
                 //Controleer of gebruiker onjuiste email opgeschreven als wel dan krijg gebruiker kennisgeving
                 if($dataNaam === "<error>"){
@@ -124,13 +121,22 @@ class account{
                     setcookie("waarschruwing","Verkeerd e-mailadres of geen dergelijk account!",time()+2);
                     //Sla session"login" op als null
                     $_SESSION["login"] = null;
-                } 
+                }
+                if(isset($_SESSION["login"])){
+                    //Update aantal logins in database
+                    $statement = $connectie->prepare("UPDATE gebruiker SET Aantal_logins=".$ALog.", Laatste_login= NOW() WHERE ID=".$_SESSION["login"][0]);
+                        if (!$statement->execute())
+                        {
+                            throw new \Exception($connectie->error);
+                        }
+                    }
+
                 
             }
             catch(\Exception $e)
             {
                 //Als er fouten zijn, komt de volgende melding: 
-                echo "<div class='alert alert-warning'><h4>Oops: Is het iets met de Server!</h4></div>";//. $e->getMessage();
+                echo "<div class='alert alert-warning'><h4>Oops: Is het iets met de Server!</h4></div>". $e->getMessage();
             }
             finally
             {
